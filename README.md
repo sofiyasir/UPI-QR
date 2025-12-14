@@ -23,7 +23,7 @@ This tool:
 - No data storage — works fully on the client side
 - Clean and responsive UI
 
-## Tech Stack
+## Tech Used
 - HTML
 - CSS
 - JavaScript
