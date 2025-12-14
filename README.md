@@ -36,8 +36,7 @@ This tool:
 4. Generate the QR code
 5. Save the QR and receive payments easily
 
-## 🔐 Privacy & Security
-
+##  Privacy & Security
 - No payment processing happens on this website
 - No user data is stored or tracked
 - QR codes are generated locally in the browser
