@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QuickUPI QR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #f4f6f8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 22px;
+      width: 360px;
+      border-radius: 14px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 24px;
+      color: #2e7d32;
+    }
+
+    /* Safety Marquee */
+    .marquee {
+      background: #fff3cd;
+      color: #856404;
+      font-size: 13px;
+      padding: 8px;
+      border-radius: 6px;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 15px;
+      border: 1px solid #ffeeba;
+    }
+
+    .marquee span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scroll 12s linear infinite;
+    }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    input {
+      width: 100%;
+      padding: 11px;
+      margin-top: 10px;
+      font-size: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: flex-start;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #444;
+      text-align: left;
+    }
+
+    .checkbox input {
+      margin-right: 8px;
+      margin-top: 2px;
+      transform: scale(1.1);
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 11px;
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      font-size: 16px;
+      border-radius: 6px;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: opacity 0.2s;
+    }
+
+    button.enabled {
+      opacity: 1;
+      cursor: pointer;
+    }
+
+    .support-btn {
+      margin-top: 12px;
+      background: #1976d2;
+      opacity: 1;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #qrcode {
+      margin-top: 20px;
+    }
+
+    #details {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: #777;
+      margin-top: 15px;
+    }
+
+    .linkedin {
+      margin-top: 10px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .linkedin a {
+      color: #0a66c2;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .linkedin a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>QuickUPI QR</h1>
+
+    <!-- Safety Warning -->
+    <div class="marquee">
+      <span>
+        ⚠️ Please double check the UPI ID and verify the recipient’s bank name before making any payment. Payments are irreversible.
+      </span>
+    </div>
+
+    <input type="text" id="upi" placeholder="Enter your UPI ID(Gpay,Phonepay,...">
+    <input type="text" id="name" placeholder="Account Holder Name">
+
+    <!-- Confirmation Checkbox -->
+    <div class="checkbox">
+      <input type="checkbox" id="confirm" onchange="toggleButton()">
+      <label for="confirm">
+        I have verified the UPI ID and understand that payments cannot be reversed.
+      </label>
+    </div>
+
+    <button id="generateBtn" onclick="generateQR()">Generate QR</button>
+
+    <div id="qrcode"></div>
+    <div id="details"></div>
+
+    <div class="footer-note">
+      This site does not store or process payments. QR is generated locally on your device.
+    </div>
+
+    <!-- LinkedIn Profile -->
+    <div class="linkedin">
+      Built by 
+      <a href="https://www.linkedin.com/in/sofi-yasir" target="www.linkedin.com/in/sofi-yasir">
+        Yasir Sofi
+      </a>
+    </div>
+  </div>
+
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <script>
+    function toggleButton() {
+      const btn = document.getElementById("generateBtn");
+      const checkbox = document.getElementById("confirm");
+
+      if (checkbox.checked) {
+        btn.classList.add("enabled");
+        btn.disabled = false;
+      } else {
+        btn.classList.remove("enabled");
+        btn.disabled = true;
+      }
+    }
+
+    function generateQR() {
+      const upi = document.getElementById("upi").value.trim();
+      const nameInput = document.getElementById("name").value.trim();
+      const checkbox = document.getElementById("confirm");
+
+      if (!checkbox.checked) {
+        alert("Please confirm that you have verified the UPI ID.");
+        return;
+      }
+
+      if (!upi) {
+        alert("Please enter a valid UPI ID");
+        return;
+      }
+
+      const displayName = nameInput || "UPI Payment";
+      const upiUrl = `upi://pay?pa=${upi}&pn=${encodeURIComponent(displayName)}&cu=INR`;
+
+      document.getElementById("qrcode").innerHTML = "";
+      document.getElementById("details").innerHTML = "";
+
+      new QRCode(document.getElementById("qrcode"), {
+        text: upiUrl,
+        width: 200,
+        height: 200
+      });
+
+      let detailsHTML = `<strong>UPI ID:</strong> ${upi}`;
+      if (nameInput) {
+        detailsHTML += `<br><strong>Name:</strong> ${nameInput}`;
+      }
+
+      document.getElementById("details").innerHTML = detailsHTML;
+    }
+  </script>
+
+</body>
+</html>
